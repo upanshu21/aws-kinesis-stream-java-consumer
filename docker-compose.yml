@@ -1,0 +1,16 @@
+version: "2.1"
+
+services:
+    localstack:
+      image: localstack/localstack
+      container_name: localstack
+      ports:
+        - "4566-4599:4566-4599" # ports of the different services
+        - "9000:9000"
+      environment:
+        - SERVICES=kinesis,cloudwatch,dynamoDB # a list of desired services you want to use.
+        - DEFAULT_REGION=eu-east-1 # This is the region where your localstack mocks to be running
+        - PORT_WEB_UI=9000
+        - LAMBDA_EXECUTOR=local
+        - DOCKER_HOST=unix:///var/run/docker.sock
+        - START_WEB=1
