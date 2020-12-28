@@ -1,30 +1,30 @@
 package com.kinesis.poc.medium;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.*;
-import com.amazonaws.services.kinesis.AbstractAmazonKinesis;
-import com.amazonaws.services.kinesis.AmazonKinesis;
-import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
-import com.amazonaws.services.kinesis.model.PutRecordRequest;
+//import com.amazonaws.services.kinesis.AmazonKinesis;
+//import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
+//import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.boot.test.context.TestComponent;
+import org.springframework.boot.test.context.TestConfiguration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.concurrent.ExecutionException;
 
-public class AwsKinesisMock extends AbstractAmazonKinesis {
+import static org.awaitility.Awaitility.await;
 
-    public static DynamoDbAsyncClient get() {
+@TestConfiguration
+public class AwsKinesisMock {
+
+    public DynamoDbAsyncClient getDynamoDbAsyncClient() {
         return DynamoDbAsyncClient.builder()
                 .region(Region.US_EAST_1)
                 .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
@@ -32,15 +32,8 @@ public class AwsKinesisMock extends AbstractAmazonKinesis {
                 .build();
     }
 
-    private static CreateTableRequest getCreateTableRequest(){
-        return new CreateTableRequest()
-                .withAttributeDefinitions(new AttributeDefinition("Name", ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement("Name", KeyType.HASH))
-                .withProvisionedThroughput(new ProvisionedThroughput(10L, 10L))
-                .withTableName("MyTable");
-    }
 
-    public static CloudWatchAsyncClient getCloudWatchAsyncClient() {
+    public CloudWatchAsyncClient getCloudWatchAsyncClient() {
         return CloudWatchAsyncClient.builder()
                 .region(Region.US_EAST_1)
                 .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
@@ -48,7 +41,7 @@ public class AwsKinesisMock extends AbstractAmazonKinesis {
                 .build();
     }
 
-    public static byte[] getEventPayload() throws JSONException, UnsupportedEncodingException {
+    public byte[] getEventPayload() throws JSONException {
 
         JSONObject internalJson = new JSONObject();
         JSONObject jsonObject = new JSONObject();
@@ -60,38 +53,40 @@ public class AwsKinesisMock extends AbstractAmazonKinesis {
         return jsonObject.toString().getBytes();
     }
 
-    public static void publishDataToKinesis() throws UnsupportedEncodingException, JSONException, ExecutionException, InterruptedException {
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials("test", "test");
-        AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration("http://localhost:4566","us-east-1");
+    public KinesisAsyncClient getKinesisMock() {
+        return KinesisAsyncClient.builder()
+                .region(Region.US_EAST_1)
+                .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
+                .endpointOverride(URI.create("http://localhost:4566"))
+                .build();
+    }
 
-
-//        KinesisAsyncClient kinesisAsyncClient = KinesisAsyncClient.builder()
-//                .region(Region.US_EAST_1)
-//                .credentialsProvider(() -> AwsBasicCredentials.create("test", "test"))
-//                .endpointOverride(URI.create("http://localhost:4566"))
-//                .build();
-
-
-        AmazonKinesisClientBuilder clientBuilder = AmazonKinesisClientBuilder.standard();
-        clientBuilder.setCredentials(new AWSStaticCredentialsProvider(awsCredentials));
-        clientBuilder.withEndpointConfiguration(endpointConfiguration);
-
-        AmazonKinesis amazonKinesis = clientBuilder.build();
-        clientBuilder.build();
-//        kinesisAsyncClient.createStream()
-      //  amazonKinesis.createStream("test",1);
-
-        PutRecordRequest putRecordRequest = new PutRecordRequest()
-                .withStreamName("test")
-                .withPartitionKey("abc")
-                .withData(ByteBuffer.wrap("hello".getBytes()));
-
-        amazonKinesis.putRecord(putRecordRequest);
+    public static void publishDataToKinesis() {
+//        BasicAWSCredentials awsCredentials = new BasicAWSCredentials("test", "test");
+//        AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration("http://localhost:4566","us-east-1");
+//        AmazonKinesisClientBuilder clientBuilder = AmazonKinesisClientBuilder.standard();
+//        clientBuilder.setCredentials(new AWSStaticCredentialsProvider(awsCredentials));
+//        clientBuilder.withEndpointConfiguration(endpointConfiguration);
+//
+//        AmazonKinesis amazonKinesis = clientBuilder.build();
+//        clientBuilder.build();
+//        amazonKinesis.createStream("test2", 1);
+//        await().until(() ->
+//                amazonKinesis.describeStream("test2").getStreamDescription().getStreamStatus().equals("ACTIVE")
+//                );
+//
+//        //amazonKinesis.createStream("test", 1);
+//        PutRecordRequest putRecordRequest = new PutRecordRequest()
+//                .withStreamName("test2")
+//                .withPartitionKey("abc")
+//                .withData(ByteBuffer.wrap("hello".getBytes()));
+//
+//        amazonKinesis.putRecord(putRecordRequest);
 
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException, JSONException, ExecutionException, InterruptedException {
-     publishDataToKinesis();
+    public static void main(String[] args) {
+        publishDataToKinesis();
     }
 
 }

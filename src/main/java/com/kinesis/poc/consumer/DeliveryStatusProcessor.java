@@ -56,20 +56,18 @@ public class DeliveryStatusProcessor implements ShardRecordProcessor {
     }
 
     public void processRecord(KinesisClientRecord record) throws IOException {
-        //records are in format of bytebuffer so find the way to convert byte buffer to the java object
         byte[] messageStatus = new byte[record.data().remaining()];
         record.data().get(messageStatus);
         String string = new String(messageStatus);
         System.out.println(string);
-        processAndPublishRecord(messageStatus);
+       // processAndPublishRecord(messageStatus);
     }
 
     public void processAndPublishRecord(byte[] messageStatus) throws IOException {
         AwsTrackedDeliveredMessageStatus awsTrackedDeliveredMessageStatus = eventProcessor.mapMessageStatusToAwsTrackedDeliveredMessageStatus(messageStatus);
         System.out.println(awsTrackedDeliveredMessageStatus.getAttributes().getRecordStatus());
         SmsNotificationDeliveryTrackingEvent smsNotificationDeliveryTrackingEvent = eventProcessor.mapAwsTrackedDeliveredMessageStatusToSmsNotificationDeliveryTrackingEvent(awsTrackedDeliveredMessageStatus);
-        System.out.println(smsNotificationDeliveryTrackingEvent.getMessageId());  //for testing purpose
-        //debug it by printing the byte string and chick if the parsing is correct or not.
+        System.out.println(smsNotificationDeliveryTrackingEvent.getMessageId());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.kinesis.poc.consumer;
 
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
@@ -9,10 +10,11 @@ import software.amazon.kinesis.common.ConfigsBuilder;
 import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
 
+import java.net.URI;
 import java.util.UUID;
 
 @Component
-public class KinesisSchedulerConfiguration extends KinesisConfiguration {
+public class KinesisSchedulerConfiguration implements Runnable{
 
     private final DeliveryStatusRecordProcessorFactory deliveryStatusRecordProcessorFactory;
 
@@ -20,24 +22,23 @@ public class KinesisSchedulerConfiguration extends KinesisConfiguration {
         this.deliveryStatusRecordProcessorFactory = deliveryStatusRecordProcessorFactory;
     }
 
-    @Override
     public void run() {
 
-        String applicationName = "demo";
+        String applicationName = "test";
         String streamName = "test";
         Region region = Region.of("us-east-1");
+
 
         KinesisAsyncClient kinesisClient = createKinesisClient(region);
         DynamoDbAsyncClient dynamoClient = createDynamoClient(region);
         CloudWatchAsyncClient cloudWatchClient = createCloudWatchAsyncClient(region);
+        System.out.println();
         ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient, cloudWatchClient, UUID.randomUUID().toString(), deliveryStatusRecordProcessorFactory);
 
         Scheduler scheduler = createScheduler(configsBuilder);
         scheduler.run();
-
     }
 
-    @Override
     public Scheduler createScheduler(ConfigsBuilder configsBuilder) {
         return new Scheduler(
                 configsBuilder.checkpointConfig(),
@@ -50,19 +51,26 @@ public class KinesisSchedulerConfiguration extends KinesisConfiguration {
         );
     }
 
-    @Override
     public KinesisAsyncClient createKinesisClient(Region region) {
-        return KinesisClientUtil.createKinesisAsyncClient(KinesisAsyncClient.builder().region(region));
+        return KinesisClientUtil.createKinesisAsyncClient(KinesisAsyncClient.builder()
+                .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
+                .endpointOverride(URI.create("http://localhost:4566"))
+                .region(region));
     }
 
-    @Override
     public DynamoDbAsyncClient createDynamoClient(Region region) {
-        return DynamoDbAsyncClient.builder().region(region).build();
+        return DynamoDbAsyncClient.builder().region(region)
+                .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
+                .endpointOverride(URI.create("http://localhost:4566"))
+                .build();
     }
 
-    @Override
     public CloudWatchAsyncClient createCloudWatchAsyncClient(Region region) {
-        return CloudWatchAsyncClient.builder().region(region).build();
+        return CloudWatchAsyncClient.builder().region(region)
+                .credentialsProvider(() -> AwsBasicCredentials.create("test","test"))
+                .endpointOverride(URI.create("http://localhost:4566"))
+                .build();
+
     }
 
 }
