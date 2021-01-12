@@ -25,7 +25,7 @@ public class KinesisSchedulerConfiguration implements Runnable{
     public void run() {
 
         String applicationName = "test";
-        String streamName = "test";
+        String streamName = "foo";
         Region region = Region.of("us-east-1");
 
 
