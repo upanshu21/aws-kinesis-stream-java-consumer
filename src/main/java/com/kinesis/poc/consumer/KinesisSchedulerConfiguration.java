@@ -9,6 +9,8 @@ import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.kinesis.common.ConfigsBuilder;
 import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
+import software.amazon.kinesis.metrics.NullMetricsFactory;
+import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import java.net.URI;
 import java.util.UUID;
@@ -25,14 +27,13 @@ public class KinesisSchedulerConfiguration implements Runnable{
     public void run() {
 
         String applicationName = "test";
-        String streamName = "foo";
+        String streamName = "test";
         Region region = Region.of("us-east-1");
 
 
         KinesisAsyncClient kinesisClient = createKinesisClient(region);
         DynamoDbAsyncClient dynamoClient = createDynamoClient(region);
         CloudWatchAsyncClient cloudWatchClient = createCloudWatchAsyncClient(region);
-        System.out.println();
         ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient, cloudWatchClient, UUID.randomUUID().toString(), deliveryStatusRecordProcessorFactory);
 
         Scheduler scheduler = createScheduler(configsBuilder);
@@ -45,7 +46,7 @@ public class KinesisSchedulerConfiguration implements Runnable{
                 configsBuilder.coordinatorConfig(),
                 configsBuilder.leaseManagementConfig(),
                 configsBuilder.lifecycleConfig(),
-                configsBuilder.metricsConfig(),
+                configsBuilder.metricsConfig().metricsFactory(new NullMetricsFactory()),
                 configsBuilder.processorConfig(),
                 configsBuilder.retrievalConfig()
         );
