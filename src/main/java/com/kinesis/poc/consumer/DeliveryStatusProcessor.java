@@ -60,14 +60,14 @@ public class DeliveryStatusProcessor implements ShardRecordProcessor {
         record.data().get(messageStatus);
         String string = new String(messageStatus);
         System.out.println(string);
-       // processAndPublishRecord(messageStatus);
+      // processAndPublishRecord(messageStatus);
     }
 
     public void processAndPublishRecord(byte[] messageStatus) throws IOException {
         AwsTrackedDeliveredMessageStatus awsTrackedDeliveredMessageStatus = eventProcessor.mapMessageStatusToAwsTrackedDeliveredMessageStatus(messageStatus);
-        System.out.println(awsTrackedDeliveredMessageStatus.getAttributes().getRecordStatus());
         SmsNotificationDeliveryTrackingEvent smsNotificationDeliveryTrackingEvent = eventProcessor.mapAwsTrackedDeliveredMessageStatusToSmsNotificationDeliveryTrackingEvent(awsTrackedDeliveredMessageStatus);
         System.out.println(smsNotificationDeliveryTrackingEvent.getMessageId());
+        // TODO : implement your logic here
     }
 
     @Override
