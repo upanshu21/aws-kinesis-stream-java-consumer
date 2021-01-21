@@ -8,6 +8,8 @@ import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.kinesis.common.ConfigsBuilder;
 import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
+import software.amazon.kinesis.metrics.NullMetricsFactory;
+
 @Component
 public class KinesisSchedulerConfig {
 
@@ -17,7 +19,7 @@ public class KinesisSchedulerConfig {
                 configsBuilder.coordinatorConfig(),
                 configsBuilder.leaseManagementConfig(),
                 configsBuilder.lifecycleConfig(),
-                configsBuilder.metricsConfig(),
+                configsBuilder.metricsConfig().metricsFactory(new NullMetricsFactory()),
                 configsBuilder.processorConfig(),
                 configsBuilder.retrievalConfig()
         );
@@ -36,6 +38,6 @@ public class KinesisSchedulerConfig {
     public CloudWatchAsyncClient createCloudWatchAsyncClient(Region region) {
         return CloudWatchAsyncClient.builder().region(region)
                 .build();
-
     }
+
 }
