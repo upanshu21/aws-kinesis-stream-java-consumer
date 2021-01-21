@@ -55,12 +55,6 @@
 			<artifactId>aws-java-sdk-dynamodb</artifactId>
 			<version>1.11.924</version>
 		</dependency>
-		<dependency>
-			<groupId>org.awaitility</groupId>
-			<artifactId>awaitility</artifactId>
-			<version>3.0.0</version>
-			<scope>test</scope>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
 			<groupId>org.json</groupId>
