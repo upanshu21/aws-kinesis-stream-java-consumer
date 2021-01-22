@@ -7,25 +7,27 @@ Consumer logic and application is seperate in this code so that you can directly
 ## Prerequsites
 
 AWS account with access for: 
-	- Kinesis Data Stream
-	- DyanamoDB
-	- Cloudwatch
+- Kinesis Data Stream
+- DyanamoDB
+- Cloudwatch
 	
 Provide the account credentials as environment variables before running the application.
 If you are using Intellij as IDE you can refer to this [link](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/setup-credentials.html)
 
-	- Create a Data stream in your AWS account
-	- Name the data stream "test". You can name the stream according to your preference but remeber to change the stream name in consumer in the **KinesisScheduler** class.
+- Create a Data stream in your AWS account
+- Name the data stream "test". You can name the stream according to your preference but remeber to change the stream name in consumer in the **KinesisScheduler** class.
 
 ## Running the application
 
-Using Intellij:
+Using **Intellij**:
 
- - Run the **KinesisConsumerApplication** class which is the main application class
+- Run the **KinesisConsumerApplication** class which is the main application class
  
-Using maven:
+Using **maven**:
 
+```
  - mvn spring-boot:run
+```
  
  This will start the consumer application but there will be no output because we have not published any data on the stream.
  
@@ -33,14 +35,14 @@ Using maven:
 
 To Publish the Dummy data, do the following:
 
-	- Comment out the ```kinesisConfiguration.run();``` in the main class inside the run method.
-	- Add the below code inside the main class. 
+- Comment out the ```kinesisConfiguration.run();``` in the main class inside the run method.
+- Add the below code inside the main class. 
 	
 ```
 	AmazonKinesisClientBuilder clientBuilder = AmazonKinesisClientBuilder.standard();
 		AmazonKinesis amazonKinesis = clientBuilder.build();
 		clientBuilder.build();
-		//amazonKinesis.createStream("test", 1);
+		//amazonKinesis.createStream("test", 1);  //uncomment to create a data stream via code with number of shard 1
 
 		JSONObject internalJson = new JSONObject();
 		JSONObject jsonObject = new JSONObject();
@@ -48,12 +50,12 @@ To Publish the Dummy data, do the following:
 		internalJson.put("messageId", "1234");
 
 		jsonObject.put("attributes", internalJson);
-		byte[] a = jsonObject.toString().getBytes();
+		byte[] sampleData = jsonObject.toString().getBytes();
 
 		PutRecordRequest putRecordRequest = new PutRecordRequest()
 				.withStreamName("test")
 				.withPartitionKey("abc")
-				.withData(ByteBuffer.wrap(a));
+				.withData(ByteBuffer.wrap(sampleData));
 
 		System.out.println(amazonKinesis.putRecord(putRecordRequest).getSequenceNumber());
 ```
@@ -61,5 +63,8 @@ To Publish the Dummy data, do the following:
 This will publish the data to the stream **test**, replace **test** with your stream name.
 The code snippet after publishing will also print the sequence number to confirm.
 Remove the snippet after publishing the data and uncomment the ```kinesisConfiguration.run();``` inside the **run()** method and rerun the consumer.
+
+
+
 
 
