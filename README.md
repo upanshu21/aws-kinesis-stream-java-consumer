@@ -65,6 +65,12 @@ The code snippet after publishing will also print the sequence number to confirm
 Remove the snippet after publishing the data and uncomment the ```kinesisConfiguration.run();``` inside the **run()** method and rerun the consumer.
 
 
+## Integration with Localstack
 
+Currently we are using a real AWS account to consumer data using consumer. For testing purposes localstack integration is in progress on the branch 
+- [feature/kinesis-localstack-integration](https://github.com/upanshu21/aws-kinesis-stream-java-consumer/tree/feature/kinesis-localstack-integration)
 
+The KCL 2.0x uses KinesisAsyncClient which is not supported by localstack currently. As soon as the feature is added to localstack we will try to integrate the consumer with localstack which can save cost and help us with writing integration tests for the consumer as will.
+
+Feel free to contribute. If you have any idea for running application raise a PR against **feature/kinesis-localstack-integration**
 
