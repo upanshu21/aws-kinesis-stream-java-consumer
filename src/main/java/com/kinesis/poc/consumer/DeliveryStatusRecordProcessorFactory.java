@@ -1,5 +1,6 @@
 package com.kinesis.poc.consumer;
 
+import com.kinesis.poc.processor.EventProcessor;
 import org.springframework.stereotype.Component;
 import software.amazon.kinesis.processor.ShardRecordProcessor;
 import software.amazon.kinesis.processor.ShardRecordProcessorFactory;

@@ -1,7 +1,6 @@
 package com.kinesis.poc.consumer;
 
-import com.kinesis.poc.events.Incoming.AwsTrackedDeliveredMessageStatus;
-import com.kinesis.poc.events.outgoing.SmsNotificationDeliveryTrackingEvent;
+import com.kinesis.poc.processor.EventProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -16,6 +15,7 @@ import java.io.IOException;
 public class DeliveryStatusProcessor implements ShardRecordProcessor {
 
     private static final String SHARD_ID_MDC_KEY = "ShardId";
+
     private final EventProcessor eventProcessor;
 
     private static final Logger log = LoggerFactory.getLogger(DeliveryStatusProcessor.class);
@@ -24,6 +24,7 @@ public class DeliveryStatusProcessor implements ShardRecordProcessor {
     public DeliveryStatusProcessor(EventProcessor eventProcessor) {
         this.eventProcessor = eventProcessor;
     }
+
 
     public void initialize(InitializationInput initializationInput) {
         shardId = initializationInput.shardId();
@@ -60,15 +61,10 @@ public class DeliveryStatusProcessor implements ShardRecordProcessor {
         record.data().get(messageStatus);
         String string = new String(messageStatus);
         System.out.println(string);
-      // processAndPublishRecord(messageStatus);
+        eventProcessor.processAndPublishRecord(messageStatus);
     }
 
-    public void processAndPublishRecord(byte[] messageStatus) throws IOException {
-        AwsTrackedDeliveredMessageStatus awsTrackedDeliveredMessageStatus = eventProcessor.mapMessageStatusToAwsTrackedDeliveredMessageStatus(messageStatus);
-        SmsNotificationDeliveryTrackingEvent smsNotificationDeliveryTrackingEvent = eventProcessor.mapAwsTrackedDeliveredMessageStatusToSmsNotificationDeliveryTrackingEvent(awsTrackedDeliveredMessageStatus);
-        System.out.println(smsNotificationDeliveryTrackingEvent.getMessageId());
-        // TODO : implement your logic here
-    }
+
 
     @Override
     public void leaseLost(LeaseLostInput leaseLostInput) {

@@ -1,4 +1,4 @@
-package com.kinesis.poc.consumer;
+package com.kinesis.poc.processor;
 
 import com.kinesis.poc.events.Incoming.AwsTrackedDeliveredMessageStatus;
 import com.kinesis.poc.events.outgoing.SmsNotificationDeliveryTrackingEvent;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class EventProcessor {
+public class EventMapper {
 
     public AwsTrackedDeliveredMessageStatus mapMessageStatusToAwsTrackedDeliveredMessageStatus(byte[] messageStatus) throws IOException {
         return AwsTrackedDeliveredMessageStatus.mapJsonToBytes(messageStatus);
