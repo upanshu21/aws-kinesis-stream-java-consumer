@@ -26,7 +26,7 @@ Using **Intellij**:
 Using **maven**:
 
 ```
- - mvn spring-boot:run
+mvn spring-boot:run
 ```
  
  This will start the consumer application but there will be no output because we have not published any data on the stream.
