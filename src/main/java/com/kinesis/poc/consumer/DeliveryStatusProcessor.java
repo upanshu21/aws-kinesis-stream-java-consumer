@@ -45,7 +45,7 @@ public class DeliveryStatusProcessor implements ShardRecordProcessor {
                 try {
                     processRecord(incomingDeliveryStatus);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.info("Failed to process records.");
                 }
             });
         } catch (Throwable t) {

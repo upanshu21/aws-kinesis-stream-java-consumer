@@ -28,8 +28,4 @@ public class AwsTrackedDeliveredMessageStatus {
         return JSON.readValue(message, AwsTrackedDeliveredMessageStatus.class);
     }
 
-    @Override
-    public String toString() {
-        return String.format("attributes", attributes);
-    }
 }
